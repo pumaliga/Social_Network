@@ -53,8 +53,9 @@ class SignUp(CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         return Response({'message': 'Sign up access',
-                         'username': response.data.get('username')},
-                        status=status.HTTP_201_CREATED)
+                         'username': response.data.get('username'),
+                         'email': response.data.get('email')},
+                         status=status.HTTP_201_CREATED)
 
 
 class PostViewSet(LikedMixin, viewsets.ModelViewSet):

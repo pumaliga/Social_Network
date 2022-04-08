@@ -1,6 +1,9 @@
 from django.contrib.contenttypes.models import ContentType
+
+from SocialNetwork.settings import EMAILHUNTER
 from .models import Like
 from django.contrib.auth import get_user_model
+import requests
 
 
 User = get_user_model()
@@ -37,4 +40,16 @@ def get_count_like(obj):
 def get_total_likes_or_data_range(date_from, date_to):
     count_of_likes = Like.objects.filter(create_at__gte=date_from, create_at__lte=date_to).count()
     return count_of_likes
+
+
+def email_check(email):
+    key = EMAILHUNTER
+    req = {"api_key":key, "email":email}
+    odg = requests.get("https://api.hunter.io/v2/email-verifier", params=req)
+    data = odg.json()
+    data = data["data"]
+    if data["gibberish"] == False and data["webmail"] == True:
+        return True
+    else:
+        return False
 

@@ -2,17 +2,20 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from network_app.models import CustomUser, Post
-from network_app.tools import is_fan, get_count_like
+from network_app.tools import is_fan, get_count_like, email_check
 
 
 class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['username', 'password']
+        fields = ['username', 'email', 'password']
 
     def save(self, **kwargs):
-        if len(self.validated_data["password"]) < 8:
+        huntercheck = email_check(self.validated_data["email"])
+        if huntercheck == False:
+            raise serializers.ValidationError({"email": "Email check is NOT valid."})
+        elif len(self.validated_data["password"]) < 8 :
             raise serializers.ValidationError({"password": "password must be at least 8 characters long"})
         self.validated_data["password"] = make_password(self.validated_data["password"])
         return super().save()
