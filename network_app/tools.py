@@ -1,12 +1,13 @@
 from django.contrib.contenttypes.models import ContentType
 
-from SocialNetwork.settings import EMAILHUNTER
 from .models import Like
 from django.contrib.auth import get_user_model
 import requests
 
 
 User = get_user_model()
+
+EMAILHUNTER = 'your api key'
 
 
 def add_like(obj, user):
