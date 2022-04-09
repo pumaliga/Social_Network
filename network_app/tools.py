@@ -1,13 +1,15 @@
 from django.contrib.contenttypes.models import ContentType
-
 from .models import Like
 from django.contrib.auth import get_user_model
 import requests
+import clearbit
 
 
 User = get_user_model()
 
 EMAILHUNTER = 'your api key'
+clearbitkey = 'your api key'
+
 
 
 def add_like(obj, user):
@@ -53,4 +55,16 @@ def email_check(email):
         return True
     else:
         return False
+
+
+def clear_data(email):
+    clearbit.key = clearbitkey
+    lookup = clearbit.Enrichment.find(email=email, stream=True)
+    if lookup != None:
+        name = str(lookup['person']["name"]["givenName"])
+        surname = str(lookup['person']["name"]["familyName"])
+        res = [name, surname]
+        return res
+    else:
+        return ["null", "null"]
 

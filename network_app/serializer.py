@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from network_app.models import CustomUser, Post
-from network_app.tools import is_fan, get_count_like, email_check
+from network_app.tools import is_fan, get_count_like, email_check, clear_data
 
 
 class SignUpSerializer(serializers.ModelSerializer):

@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from network_app.models import CustomUser, Post
 from network_app.serializer import SignUpSerializer, PostSerializer, FanSerializer
-from network_app.tools import add_like, remove_like, get_fans
+from network_app.tools import add_like, remove_like, get_fans, clear_data
 
 
 class LikedMixin:
@@ -52,6 +52,8 @@ class SignUp(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
+        lookup = clear_data(response.data["email"])
+        print(lookup)
         return Response({'message': 'Sign up access',
                          'username': response.data.get('username'),
                          'email': response.data.get('email')},
