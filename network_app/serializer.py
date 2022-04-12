@@ -2,7 +2,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 
 from network_app.models import CustomUser, Post
-from network_app.tools import is_fan, get_count_like, email_check, clear_data
+from network_app.tools import is_fan, get_count_like, email_check
 
 
 class SignUpSerializer(serializers.ModelSerializer):
@@ -58,3 +58,16 @@ class FanSerializer(serializers.ModelSerializer):
 
     def get_user_id(self, obj):
         return obj.id
+
+
+class DateSerializer(serializers.Serializer):
+    date_from = serializers.DateField()
+    date_to = serializers.DateField()
+
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        if data['date_from'] > data['date_to']:
+            raise serializers.ValidationError("finish must occur after start")
+        return data

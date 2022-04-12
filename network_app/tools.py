@@ -1,3 +1,4 @@
+import os
 from django.contrib.contenttypes.models import ContentType
 from .models import Like
 from django.contrib.auth import get_user_model
@@ -6,10 +7,6 @@ import clearbit
 
 
 User = get_user_model()
-
-EMAILHUNTER = 'your api key'
-clearbitkey = 'your api key'
-
 
 
 def add_like(obj, user):
@@ -46,7 +43,7 @@ def get_total_likes_or_data_range(date_from, date_to):
 
 
 def email_check(email):
-    key = EMAILHUNTER
+    key = os.environ["EMAILHUNTER"]
     req = {"api_key":key, "email":email}
     odg = requests.get("https://api.hunter.io/v2/email-verifier", params=req)
     data = odg.json()
@@ -58,7 +55,7 @@ def email_check(email):
 
 
 def clear_data(email):
-    clearbit.key = clearbitkey
+    clearbit.key = os.environ["CLEARBIT"]
     lookup = clearbit.Enrichment.find(email=email, stream=True)
     if lookup != None:
         name = str(lookup['person']["name"]["givenName"])

@@ -3,10 +3,11 @@ from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from network_app.models import CustomUser, Post
-from network_app.serializer import SignUpSerializer, PostSerializer, FanSerializer
-from network_app.tools import add_like, remove_like, get_fans, clear_data
+from network_app.serializer import SignUpSerializer, PostSerializer, FanSerializer, DateSerializer
+from network_app.tools import add_like, remove_like, get_fans, clear_data, get_total_likes_or_data_range
 
 
 class LikedMixin:
@@ -39,8 +40,6 @@ class LikedMixin:
         """
         obj = self.get_object()
         fans = get_fans(obj)
-        print(obj, 'obj')
-        print(fans, 'fans')
         serializer = FanSerializer(fans, many=True)
         return Response(serializer.data)
 
@@ -53,7 +52,6 @@ class SignUp(CreateAPIView):
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         lookup = clear_data(response.data["email"])
-        print(lookup)
         return Response({'message': 'Sign up access',
                          'username': response.data.get('username'),
                          'email': response.data.get('email')},
@@ -108,3 +106,20 @@ class PostViewSet(LikedMixin, viewsets.ModelViewSet):
             {"detail": "you did not create this post"})
 
 
+class AnaliticsView(APIView):
+
+    def get(self, request):
+        """
+        analytics about how many likes were made.
+        example url /api/analytics/?date_from=2020-02-02&date_to=2020-02-15
+        """
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
+        serializer = DateSerializer(data={'date_from': date_from, 'date_to': date_to})
+        if serializer.is_valid():
+            date_from = serializer.data.get('date_from')
+            date_to = serializer.data.get('date_to')
+
+            return Response({"total_likes": get_total_likes_or_data_range(date_from, date_to)})
+
+        return Response(serializer.errors)
